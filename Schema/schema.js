@@ -69,7 +69,7 @@ const CommentType = new GraphQLObjectType({
     id: { type: GraphQLString },
     data: { type: GraphQLString },
     like: { type: GraphQLString },
-    date: { type: GraphQLString },
+    createdAt: { type: GraphQLString },
   }),
 });
 
@@ -90,6 +90,34 @@ const RootQuery = new GraphQLObjectType({
       args: { id: { type: GraphQLID } },
       resolve(_, args) {
         return User.findById(args.id);
+      },
+    },
+    comment: {
+      type: CommentType,
+      args: {
+        id: { type: GraphQLString },
+      },
+      resolve(_, args) {
+        return Comment.findById(args.id);
+      },
+    },
+    posts: {
+      type: PostType,
+      resolve(_, _) {
+        return Post.find({});
+      },
+    },
+    users: {
+      type: UserType,
+      resolve(_, _) {
+        return User.find({});
+      },
+    },
+    commetns: {
+      type: CommentType,
+      args: { postId: { type: GraphQLID } },
+      resolve(_, args) {
+        return Comment.find({ postId: args.postId });
       },
     },
   },
@@ -138,6 +166,22 @@ const Mutation = new GraphQLObjectType({
           authorId: args.authorId,
         });
         return post.save();
+      },
+    },
+    addComment: {
+      type: CommentType,
+      args: {
+        postId: { type: GraphQLID },
+        userId: { type: GraphQLID },
+        data: { type: GraphQLString },
+      },
+      resolve(_, args) {
+        const comment = new Comment({
+          postId: args.postId,
+          userId: args.userId,
+          data: args.data,
+        });
+        return comment.save();
       },
     },
   },

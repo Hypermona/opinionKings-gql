@@ -6,7 +6,8 @@ const commentScheme = new Schema(
   {
     data: String,
     likes: Number,
-    date: { type: Date, default: Date.now },
+    postId: mongoose.Types.ObjectId,
+    authorId: mongoose.Types.ObjectId,
   },
   { timestamps: true }
 );
@@ -23,7 +24,6 @@ const postSchema = new Schema(
     shares: { type: Number, default: 0 },
     saves: { type: Number, default: 0 },
     tags: [String],
-    comments: [commentScheme],
   },
   { timestamps: true }
 );
