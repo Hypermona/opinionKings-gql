@@ -151,6 +151,7 @@ const Mutation = new GraphQLObjectType({
         name: { type: GraphQLString },
         userName: { type: GraphQLString },
         email: { type: GraphQLString },
+        password: { type: GraphQLString },
         verified: { type: GraphQLBoolean },
       },
       resolve(_, args) {
@@ -159,6 +160,7 @@ const Mutation = new GraphQLObjectType({
           name: args.name,
           userName: args.userName,
           email: args.email,
+          password: args.password,
           verified: args.verified,
         });
         return user.save();

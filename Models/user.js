@@ -8,6 +8,7 @@ const userSchema = new Schema(
     image: String,
     userName: String,
     email: String,
+    password: String,
     followers: { type: Number, default: 0 },
     following: { type: Number, default: 0 },
     verified: { type: Boolean, default: false },
