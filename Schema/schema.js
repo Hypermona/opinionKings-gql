@@ -1,4 +1,8 @@
 const graphql = require("graphql");
+var cloudinary = require("cloudinary").v2;
+require("dotenv").config();
+
+let timestamp = Math.round(new Date().getTime() / 1000);
 
 const User = require("../Models/user");
 const { Post, Comment } = require("../Models/post");
@@ -99,6 +103,20 @@ const RootQuery = new GraphQLObjectType({
       },
       resolve(_, args) {
         return Comment.findById(args.id);
+      },
+    },
+    signature: {
+      type: GraphQLString,
+      resolve(_, __) {
+        let signature = cloudinary.utils.api_sign_request(
+          {
+            timestamp: timestamp,
+            eager: "w_400,h_300,c_pad|w_260,h_200,c_crop",
+            public_id: "sample_image",
+          },
+          process.env.API_SECRET
+        );
+        return signature;
       },
     },
     posts: {
