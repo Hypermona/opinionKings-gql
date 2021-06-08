@@ -4,6 +4,7 @@
   "main": "app.js",
   "license": "MIT",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "cloudinary": "^1.25.2",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",

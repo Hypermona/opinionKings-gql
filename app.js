@@ -24,5 +24,5 @@ app.use(
 );
 
 app.listen(4000, () => {
-  console.log("Litening at 4000...");
+  console.log("Litening at http://localhost:4000/");
 });

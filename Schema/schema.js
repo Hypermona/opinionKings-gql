@@ -1,5 +1,6 @@
 const graphql = require("graphql");
-var cloudinary = require("cloudinary").v2;
+const cloudinary = require("cloudinary").v2;
+const bcrypt = require("bcrypt");
 require("dotenv").config();
 
 let timestamp = Math.round(new Date().getTime() / 1000);
@@ -154,16 +155,29 @@ const Mutation = new GraphQLObjectType({
         password: { type: GraphQLString },
         verified: { type: GraphQLBoolean },
       },
-      resolve(_, args) {
-        const user = new User({
-          image: args.image,
-          name: args.name,
-          userName: args.userName,
-          email: args.email,
-          password: args.password,
-          verified: args.verified,
-        });
-        return user.save();
+      async resolve(_, args) {
+        try {
+          const email = await User.findOne({ email: args.email });
+          if (email) {
+            throw new Error("User exists already.");
+          }
+          const userName = await User.findOne({ userName: args.userName });
+          if (userName) {
+            throw new Error("username exists already.");
+          }
+          const password = await bcrypt.hash(args.password, 12);
+          const user = new User({
+            image: args.image,
+            name: args.name,
+            userName: args.userName,
+            email: args.email,
+            password: password,
+            verified: args.verified,
+          });
+          return user.save();
+        } catch (err) {
+          throw err;
+        }
       },
     },
     addPost: {
