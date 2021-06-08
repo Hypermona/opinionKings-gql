@@ -1,6 +1,8 @@
 const graphql = require("graphql");
 const cloudinary = require("cloudinary").v2;
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
 require("dotenv").config();
 
 let timestamp = Math.round(new Date().getTime() / 1000);
@@ -78,6 +80,14 @@ const CommentType = new GraphQLObjectType({
   }),
 });
 
+const LoginType = new GraphQLObjectType({
+  name: "Login",
+  fields: () => ({
+    id: { type: GraphQLID },
+    token: { type: GraphQLString },
+    tokenExpiration: { type: GraphQLInt },
+  }),
+});
 const RootQuery = new GraphQLObjectType({
   name: "RootQueryType",
   fields: {
@@ -104,6 +114,27 @@ const RootQuery = new GraphQLObjectType({
       },
       resolve(_, args) {
         return Comment.findById(args.id);
+      },
+    },
+    login: {
+      type: LoginType,
+      args: {
+        userName: { type: GraphQLString },
+        email: { type: GraphQLString },
+        password: { type: GraphQLString },
+      },
+      async resolve(_, args) {
+        const _credential = args.userName ? { userName: args.userName } : { email: args.email };
+        const user = await User.findOne(_credential);
+        if (!user) {
+          throw new Error("username or password is not matching");
+        }
+        const isEqual = await bcrypt.compare(args.password, user.password);
+        if (!isEqual) {
+          throw new Error("username or password is not matching[p]");
+        }
+        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+        return { id: user.id, token: token, tokenExpiration: 1 };
       },
     },
     signature: {
