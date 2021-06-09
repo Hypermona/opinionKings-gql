@@ -221,7 +221,10 @@ const Mutation = new GraphQLObjectType({
         tags: { type: new GraphQLList(GraphQLString) },
         authorId: { type: GraphQLID },
       },
-      resolve(_, args) {
+      resolve(_, args, req) {
+        if (!req.isAuth) {
+          throw new Error("not authenticated");
+        }
         const post = new Post({
           title: args.title,
           image: args.image,

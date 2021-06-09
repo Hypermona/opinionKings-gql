@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const { graphqlHTTP } = require("express-graphql");
+const isAuth = require("./Middleware/isAuth");
 
 const schema = require("./Schema/schema");
 
@@ -14,6 +15,8 @@ mongoose.connect("mongodb://127.0.0.1:27017/kings", {
 mongoose.connection.once("open", () => {
   console.log("connected to mongodb kings....");
 });
+
+app.use(isAuth);
 
 app.use(
   "/",
