@@ -5,6 +5,12 @@ const jwt = require("jsonwebtoken");
 
 require("dotenv").config();
 
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
+});
+
 let timestamp = Math.round(new Date().getTime() / 1000);
 
 const User = require("../Models/user");
@@ -32,6 +38,7 @@ const UserType = new GraphQLObjectType({
     follwing: { type: GraphQLInt },
     verified: { type: GraphQLBoolean },
     createdAt: { type: GraphQLString },
+    token: { type: GraphQLString },
     posts: {
       type: new GraphQLList(PostType),
       resolve(parent, _) {
@@ -116,27 +123,7 @@ const RootQuery = new GraphQLObjectType({
         return Comment.findById(args.id);
       },
     },
-    login: {
-      type: LoginType,
-      args: {
-        userName: { type: GraphQLString },
-        email: { type: GraphQLString },
-        password: { type: GraphQLString },
-      },
-      async resolve(_, args) {
-        const _credential = args.userName ? { userName: args.userName } : { email: args.email };
-        const user = await User.findOne(_credential);
-        if (!user) {
-          throw new Error("username or password is not matching");
-        }
-        const isEqual = await bcrypt.compare(args.password, user.password);
-        if (!isEqual) {
-          throw new Error("username or password is not matching[p]");
-        }
-        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
-        return { id: user.id, token: token, tokenExpiration: 1 };
-      },
-    },
+
     signature: {
       type: GraphQLString,
       resolve(_, __) {
@@ -179,6 +166,7 @@ const Mutation = new GraphQLObjectType({
     addUser: {
       type: UserType,
       args: {
+        new: { type: GraphQLBoolean },
         image: { type: GraphQLString },
         name: { type: GraphQLString },
         userName: { type: GraphQLString },
@@ -188,27 +176,62 @@ const Mutation = new GraphQLObjectType({
       },
       async resolve(_, args) {
         try {
-          const email = await User.findOne({ email: args.email });
-          if (email) {
-            throw new Error("User exists already.");
+          if (args.new) {
+            const email = await User.findOne({ email: args.email });
+            if (email) {
+              throw new Error("User exists already.");
+            }
+            const userName = await User.findOne({ userName: args.userName });
+            if (userName) {
+              throw new Error("username exists already.");
+            }
           }
-          const userName = await User.findOne({ userName: args.userName });
-          if (userName) {
-            throw new Error("username exists already.");
-          }
+
+          let imageResponse = await cloudinary.uploader.upload(args.image, {
+            upload_preset: "ml_default",
+          });
           const password = await bcrypt.hash(args.password, 12);
           const user = new User({
-            image: args.image,
+            image: imageResponse.public_id,
             name: args.name,
             userName: args.userName,
             email: args.email,
             password: password,
             verified: args.verified,
           });
-          return user.save();
+          const data = await user.save();
+          if (args.new) {
+            const token = await jwt.sign({ id: data.id }, process.env.JWT_SECRET, {
+              expiresIn: "1h",
+            });
+            return { id: user.id, token: token, tokenExpiration: 1 };
+          } else {
+            return data;
+          }
         } catch (err) {
           throw err;
         }
+      },
+    },
+    login: {
+      type: LoginType,
+      args: {
+        userName: { type: GraphQLString },
+        email: { type: GraphQLString },
+        password: { type: GraphQLString },
+      },
+      async resolve(_, args) {
+        const _credential = args.userName ? { userName: args.userName } : { email: args.email };
+        const user = await User.findOne(_credential);
+        if (!user) {
+          throw new Error("username or password is not matching");
+        }
+        const isEqual = await bcrypt.compare(args.password, user.password);
+        if (!isEqual) {
+          throw new Error("username or password is not matching[p]");
+        }
+        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+        return { id: user.id, token: token, tokenExpiration: 1 };
       },
     },
     addPost: {
@@ -221,13 +244,24 @@ const Mutation = new GraphQLObjectType({
         tags: { type: new GraphQLList(GraphQLString) },
         authorId: { type: GraphQLID },
       },
-      resolve(_, args, req) {
+      async resolve(_, args, req) {
         if (!req.isAuth) {
           throw new Error("not authenticated");
         }
+        const subFolder = args.category ? args.category : "all";
+        const imageResponse = await cloudinary.uploader.upload(
+          args.image,
+          { folder: `${subFolder}/`, upload_preset: "ml_default" },
+          (error, result) => {
+            if (error) {
+              throw error;
+            }
+            return result;
+          }
+        );
         const post = new Post({
           title: args.title,
-          image: args.image,
+          image: imageResponse.public_id,
           shortDescription: args.shortDescription,
           description: args.description,
           tags: args.tags,
