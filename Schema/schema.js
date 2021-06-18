@@ -186,10 +186,14 @@ const Mutation = new GraphQLObjectType({
               throw new Error("username exists already.");
             }
           }
-
-          let imageResponse = await cloudinary.uploader.upload(args.image, {
-            upload_preset: "ml_default",
-          });
+          let imageResponse;
+          if (args.image) {
+            imageResponse = await cloudinary.uploader.upload(args.image, {
+              upload_preset: "ml_default",
+            });
+          } else {
+            imageResponse.public_id = null;
+          }
           const password = await bcrypt.hash(args.password, 12);
           const user = new User({
             image: imageResponse.public_id,
@@ -248,17 +252,22 @@ const Mutation = new GraphQLObjectType({
         if (!req.isAuth) {
           throw new Error("not authenticated");
         }
-        const subFolder = args.category ? args.category : "all";
-        const imageResponse = await cloudinary.uploader.upload(
-          args.image,
-          { folder: `${subFolder}/`, upload_preset: "ml_default" },
-          (error, result) => {
-            if (error) {
-              throw error;
+        let imageResponse;
+        if (args.image) {
+          const subFolder = args.category ? args.category : "all";
+          imageResponse = await cloudinary.uploader.upload(
+            args.image,
+            { folder: `${subFolder}/`, upload_preset: "ml_default" },
+            (error, result) => {
+              if (error) {
+                throw error;
+              }
+              return result;
             }
-            return result;
-          }
-        );
+          );
+        } else {
+          imageResponse.public_id = null;
+        }
         const post = new Post({
           title: args.title,
           image: imageResponse.public_id,
