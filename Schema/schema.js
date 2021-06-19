@@ -225,11 +225,16 @@ const Mutation = new GraphQLObjectType({
         password: { type: GraphQLString },
       },
       async resolve(_, args) {
-        const _credential = args.userName ? { userName: args.userName } : { email: args.email };
-        const user = await User.findOne(_credential);
+        console.log(args);
+        let user = await User.findOne({ userName: args.userName });
+        console.log(user);
+        if (!user) {
+          user = await User.findOne({ email: args.userName });
+        }
         if (!user) {
           throw new Error("username or password is not matching");
         }
+
         const isEqual = await bcrypt.compare(args.password, user.password);
         if (!isEqual) {
           throw new Error("username or password is not matching[p]");
