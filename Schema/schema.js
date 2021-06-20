@@ -192,11 +192,11 @@ const Mutation = new GraphQLObjectType({
               upload_preset: "ml_default",
             });
           } else {
-            imageResponse.public_id = null;
+            imageResponse.secure_url = null;
           }
           const password = await bcrypt.hash(args.password, 12);
           const user = new User({
-            image: imageResponse.public_id,
+            image: imageResponse.secure_url,
             name: args.name,
             userName: args.userName,
             email: args.email,
@@ -225,9 +225,7 @@ const Mutation = new GraphQLObjectType({
         password: { type: GraphQLString },
       },
       async resolve(_, args) {
-        console.log(args);
         let user = await User.findOne({ userName: args.userName });
-        console.log(user);
         if (!user) {
           user = await User.findOne({ email: args.userName });
         }
@@ -257,31 +255,30 @@ const Mutation = new GraphQLObjectType({
         if (!req.isAuth) {
           throw new Error("not authenticated");
         }
-        let imageResponse;
-        if (args.image) {
-          const subFolder = args.category ? args.category : "all";
-          imageResponse = await cloudinary.uploader.upload(
-            args.image,
-            { folder: `${subFolder}/`, upload_preset: "ml_default" },
-            (error, result) => {
-              if (error) {
-                throw error;
-              }
-              return result;
-            }
-          );
-        } else {
-          imageResponse.public_id = null;
+
+        try {
+          let imageResponse = {};
+          if (args.image) {
+            // const subFolder = args.category ? args.category : "all";
+            imageResponse = await cloudinary.uploader.upload(args.image, {
+              // folder: `${subFolder}/`,
+              upload_preset: "ml_default",
+            });
+          } else {
+            imageResponse.secure_url = "";
+          }
+          const post = new Post({
+            title: args.title,
+            image: imageResponse.secure_url,
+            shortDescription: args.shortDescription,
+            description: args.description,
+            tags: args.tags,
+            authorId: args.authorId,
+          });
+          return post.save();
+        } catch (err) {
+          throw err;
         }
-        const post = new Post({
-          title: args.title,
-          image: imageResponse.public_id,
-          shortDescription: args.shortDescription,
-          description: args.description,
-          tags: args.tags,
-          authorId: args.authorId,
-        });
-        return post.save();
       },
     },
     addComment: {
