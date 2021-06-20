@@ -273,7 +273,7 @@ const Mutation = new GraphQLObjectType({
             shortDescription: args.shortDescription,
             description: args.description,
             tags: args.tags,
-            authorId: args.authorId,
+            authorId: req.id,
           });
           return post.save();
         } catch (err) {
