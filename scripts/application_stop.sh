@@ -1,4 +1,8 @@
 #!/bin/bash
 #Stopping existing node servers
-echo "Stopping any existing node servers"
-pkill node
+
+isExistApp = `pgrep node`
+if [[ -n  $isExistApp ]]; then
+    echo "Stopping any existing node servers"
+    pkill node        
+fi
