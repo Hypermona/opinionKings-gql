@@ -26,7 +26,7 @@ mongoose.connect(mongoDbUrl, {
 });
 
 mongoose.connection.once("open", () => {
-  console.log("connected to mongodb kings..vv.");
+  console.log("connected to mongodb kings...");
 });
 
 app.use(isAuth);
