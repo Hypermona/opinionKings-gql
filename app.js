@@ -18,7 +18,7 @@ app.use((req, res, next) => {
   next();
 });
 app.use(express.json({ limit: "5mb" }));
-mongoose.connect("mongodb://127.0.0.1:27017/kings", {
+mongoose.connect("mongodb://127.0.0.1:27017/kings...", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
