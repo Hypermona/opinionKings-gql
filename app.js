@@ -18,7 +18,8 @@ app.use((req, res, next) => {
   next();
 });
 app.use(express.json({ limit: "5mb" }));
-mongoose.connect("mongodb://127.0.0.1:27017/kings...", {
+const mongoDbUrl = `mongodb://${process.env.DB_USER}:${process.env.DB_PWD}@localhost/${process.env.DB_NAME}`;
+mongoose.connect(mongoDbUrl, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
