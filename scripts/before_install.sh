@@ -6,7 +6,7 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
 nvm install node
 
 #create our working directory if it doesnt exist
-DIR="/home/ec2-user/"
+DIR="/home/ec2-user/express-gql"
 if [ -d "$DIR" ]; then
   echo "${DIR} exists"
 else
