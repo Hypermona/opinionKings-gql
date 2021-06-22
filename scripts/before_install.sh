@@ -13,3 +13,11 @@ else
   echo "Creating ${DIR} directory"
   mkdir ${DIR}
 fi
+
+cd ~
+sudo yum erase codedeploy-agent -y
+cd /opt
+sudo rm -r codedeploy-agent/
+cd ~
+sudo rm -r express-app/
+sudo ./install auto
