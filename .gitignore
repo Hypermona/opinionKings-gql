@@ -2,7 +2,7 @@
 /node_modules
 /.pnp
 .pnp.js
-
+user-data.txt
 # testing
 /coverage
 
