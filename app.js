@@ -8,7 +8,16 @@ const schema = require("./Schema/schema");
 
 const app = express();
 app.use(cors());
-
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST,GET,OPTIONS");
+  res.setHeader("Acess-Control-Allow-Headers", "Content-Type", "Authorization");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  next();
+});
+app.use(express.json({ limit: "5mb" }));
 mongoose.connect("mongodb://127.0.0.1:27017/kings", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
