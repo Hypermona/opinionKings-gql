@@ -12,7 +12,7 @@ module.exports = {
       key: "~/Desktop/ec2-mumbai-opinion-kings-hypermona.pem",
       ref: "origin/main",
       repo: "git@github.com:Hypermona/opinionKings-gql.git",
-      path: "/home/ec2-user/opinionKings-gql",
+      path: "~/opinionKings-gql",
       "post-deploy": "npm install && pm2 startOrRestart ecosystem.config.js",
     },
   },
