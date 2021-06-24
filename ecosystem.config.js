@@ -7,7 +7,7 @@ module.exports = {
   ],
   deploy: {
     production: {
-      user: "root",
+      user: "ec2-user",
       host: "ec2-3-108-82-42.ap-south-1.compute.amazonaws.com",
       key: "~/Desktop/ec2-mumbai-opinion-kings-hypermona.pem",
       ref: "origin/main",
