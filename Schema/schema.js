@@ -186,7 +186,7 @@ const Mutation = new GraphQLObjectType({
               throw new Error("username exists already.");
             }
           }
-          let imageResponse;
+          let imageResponse = {};
           if (args.image) {
             imageResponse = await cloudinary.uploader.upload(args.image, {
               upload_preset: "ml_default",
@@ -225,9 +225,9 @@ const Mutation = new GraphQLObjectType({
         password: { type: GraphQLString },
       },
       async resolve(_, args) {
-        let user = await User.findOne({ userName: args.userName });
+        let user = await User.findOne({ userName: args.email });
         if (!user) {
-          user = await User.findOne({ email: args.userName });
+          user = await User.findOne({ email: args.email });
         }
         if (!user) {
           throw new Error("username or password is not matching");
