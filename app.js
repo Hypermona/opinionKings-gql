@@ -18,8 +18,8 @@ app.use((req, res, next) => {
   next();
 });
 app.use(express.json({ limit: "5mb" }));
-// const mongoDbUrl = `mongodb://${process.env.DB_USER}:${process.env.DB_PWD}@localhost:27017/${process.env.DB_NAME}?authSource=${process.env.DB_NAME}&w=1`;
-const mongoDbUrl  = 'mongodb://localhost:27017/fakeking'
+const mongoDbUrl = `mongodb://${process.env.DB_USER}:${process.env.DB_PWD}@localhost:27017/${process.env.DB_NAME}?authSource=${process.env.DB_NAME}&w=1`;
+// const mongoDbUrl  = 'mongodb://localhost:27017/fakeking'
 mongoose.connect(mongoDbUrl, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
