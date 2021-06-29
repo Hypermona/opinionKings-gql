@@ -95,6 +95,13 @@ const LoginType = new GraphQLObjectType({
     tokenExpiration: { type: GraphQLInt },
   }),
 });
+
+const chekUserType = new GraphQLObjectType({
+  name: "chekUser",
+  fields: () => ({
+    user: { type: GraphQLBoolean },
+  }),
+});
 const RootQuery = new GraphQLObjectType({
   name: "RootQueryType",
   fields: {
@@ -157,6 +164,18 @@ const RootQuery = new GraphQLObjectType({
         return Comment.find({ postId: args.postId });
       },
     },
+    checkUser: {
+      type: chekUserType,
+      args: { userName: { type: GraphQLString } },
+      async resolve(_, args) {
+        const user = await User.findOne({ userName: args.userName });
+        if (user) {
+          return { user: true };
+        } else {
+          return { user: false };
+        }
+      },
+    },
   },
 });
 
@@ -177,13 +196,13 @@ const Mutation = new GraphQLObjectType({
       async resolve(_, args) {
         try {
           if (args.new) {
-            const email = await User.findOne({ email: args.email });
-            if (email) {
-              throw new Error("User exists already.");
-            }
             const userName = await User.findOne({ userName: args.userName });
             if (userName) {
-              throw new Error("username exists already.");
+              throw new Error("userName exists already.");
+            }
+            const email = await User.findOne({ email: args.email });
+            if (email) {
+              throw new Error("email exists already.");
             }
           }
           let imageResponse = {};
@@ -235,7 +254,7 @@ const Mutation = new GraphQLObjectType({
 
         const isEqual = await bcrypt.compare(args.password, user.password);
         if (!isEqual) {
-          throw new Error("username or password is not matching[p]");
+          throw new Error("username or password is not matching");
         }
         const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
         return { id: user.id, token: token, tokenExpiration: 1 };
