@@ -12,7 +12,7 @@ cloudinary.config({
 });
 
 let timestamp = Math.round(new Date().getTime() / 1000);
-
+const Category = require("../Models/category");
 const User = require("../Models/user");
 const { Post, Comment } = require("../Models/post");
 
@@ -26,6 +26,7 @@ const {
   GraphQLSchema,
 } = graphql;
 
+////////////////// Types /////////////////////////
 const UserType = new GraphQLObjectType({
   name: "User",
   fields: () => ({
@@ -102,6 +103,21 @@ const chekUserType = new GraphQLObjectType({
     user: { type: GraphQLBoolean },
   }),
 });
+
+const CategoryType = new GraphQLObjectType({
+  name: "Category",
+  fields: () => ({
+    name: { type: GraphQLString },
+    posts: {
+      type: new GraphQLList(PostType),
+      resolve(parent, _) {
+        return Post.find({ authorId: parent.id });
+      },
+    },
+  }),
+});
+
+////////////////// Queries /////////////////////////
 const RootQuery = new GraphQLObjectType({
   name: "RootQueryType",
   fields: {
@@ -176,9 +192,16 @@ const RootQuery = new GraphQLObjectType({
         }
       },
     },
+    categorys: {
+      type: CategoryType,
+      resolve() {
+        return Category.find({});
+      },
+    },
   },
 });
 
+////////////////// Muations /////////////////////////
 const Mutation = new GraphQLObjectType({
   name: "Mutation",
   fields: {
@@ -314,6 +337,18 @@ const Mutation = new GraphQLObjectType({
           data: args.data,
         });
         return comment.save();
+      },
+    },
+    addCategory: {
+      type: CategoryType,
+      args: {
+        name: { type: GraphQLString },
+      },
+      resolve(_, args) {
+        const category = new Category({
+          name: args.name,
+        });
+        return category.save();
       },
     },
   },
