@@ -199,7 +199,7 @@ const RootQuery = new GraphQLObjectType({
         }
       },
     },
-    categorys: {
+    categories: {
       type: new GraphQLList(CategoryType),
       resolve() {
         return Category.find({});
