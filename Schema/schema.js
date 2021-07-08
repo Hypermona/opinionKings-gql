@@ -118,7 +118,7 @@ const CategoryType = new GraphQLObjectType({
     posts: {
       type: new GraphQLList(PostType),
       resolve(parent, _) {
-        return Post.find({ authorId: parent.id });
+        return Post.find({ categoryId: parent.id });
       },
     },
   }),
@@ -157,9 +157,9 @@ const RootQuery = new GraphQLObjectType({
       type: CategoryType,
       args: {
         id: { type: GraphQLString },
-        resolve(_, args) {
-          return Comment.findById(args.id);
-        },
+      },
+      resolve(_, args) {
+        return Category.findById(args.id);
       },
     },
     signature: {
