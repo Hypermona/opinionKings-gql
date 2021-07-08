@@ -107,6 +107,7 @@ const chekUserType = new GraphQLObjectType({
 const CategoryType = new GraphQLObjectType({
   name: "Category",
   fields: () => ({
+    id: { type: GraphQLID },
     name: { type: GraphQLString },
     posts: {
       type: new GraphQLList(PostType),
