@@ -68,6 +68,12 @@ const PostType = new GraphQLObjectType({
     shares: { type: GraphQLInt },
     saves: { type: GraphQLInt },
     tags: { type: new GraphQLList(GraphQLString) },
+    category: {
+      type: CategoryType,
+      resolve(parent, _) {
+        return Category.findById(parent.categoryId);
+      },
+    },
     comments: {
       type: new GraphQLList(CommentType),
       resolve(parent, _) {

@@ -23,6 +23,7 @@ const postSchema = new Schema(
     dislikes: { type: Number, default: 0 },
     shares: { type: Number, default: 0 },
     saves: { type: Number, default: 0 },
+    categoryId: mongoose.Types.ObjectId,
     tags: [String],
   },
   { timestamps: true }
