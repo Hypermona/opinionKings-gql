@@ -153,7 +153,15 @@ const RootQuery = new GraphQLObjectType({
         return Comment.findById(args.id);
       },
     },
-
+    category: {
+      type: CategoryType,
+      args: {
+        id: { type: GraphQLString },
+        resolve(_, args) {
+          return Comment.findById(args.id);
+        },
+      },
+    },
     signature: {
       type: GraphQLString,
       resolve(_, __) {
