@@ -193,7 +193,7 @@ const RootQuery = new GraphQLObjectType({
       },
     },
     categorys: {
-      type: CategoryType,
+      type: new GraphQLList(CategoryType),
       resolve() {
         return Category.find({});
       },
