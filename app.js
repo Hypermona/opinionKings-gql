@@ -3,13 +3,19 @@ const mongoose = require("mongoose");
 const { graphqlHTTP } = require("express-graphql");
 const isAuth = require("./Middleware/isAuth");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 
 const schema = require("./Schema/schema");
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
   res.setHeader("Access-Control-Allow-Methods", "POST,GET,OPTIONS");
   res.setHeader("Acess-Control-Allow-Headers", "Content-Type", "Authorization");
   if (req.method === "OPTIONS") {
@@ -29,14 +35,16 @@ mongoose.connection.once("open", () => {
   console.log("connected to mongodb kings...");
 });
 
+app.use(cookieParser());
+
 app.use(isAuth);
 
-app.use(
-  "/",
+app.use("/", (req, res) =>
   graphqlHTTP({
     schema,
     graphiql: true,
-  })
+    context: { req, res },
+  })(req, res)
 );
 
 app.listen(4000, () => {

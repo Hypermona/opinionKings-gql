@@ -18,4 +18,13 @@ const chekUserType = new GraphQLObjectType({
   }),
 });
 
-module.exports = { LoginType, chekUserType };
+const RefreshToken = new GraphQLObjectType({
+  name: "refreshToken",
+  fields: () => ({
+    id: { type: GraphQLID },
+    token: { type: GraphQLString },
+    tokenExpiration: { type: GraphQLInt },
+  }),
+});
+
+module.exports = { LoginType, chekUserType, RefreshToken };

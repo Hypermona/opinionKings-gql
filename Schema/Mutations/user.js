@@ -29,15 +29,17 @@ const MutationFields = {
       password: { type: GraphQLString },
       verified: { type: GraphQLBoolean },
     },
-    async resolve(_, args) {
+    async resolve(_, args, context) {
       try {
         if (args.new) {
           const userName = await User.findOne({ userName: args.userName });
           if (userName) {
+            context.res.status(409);
             throw new Error("userName exists already.");
           }
           const email = await User.findOne({ email: args.email });
           if (email) {
+            context.res.status(409);
             throw new Error("email exists already.");
           }
         }
@@ -61,8 +63,13 @@ const MutationFields = {
         const data = await user.save();
         if (args.new) {
           const token = await jwt.sign({ id: data.id }, process.env.JWT_SECRET, {
+            expiresIn: "30s",
+          });
+          const refreshToken = await jwt.sign({ id: data.id }, process.env.JWT_REFRESH_SECRET, {
             expiresIn: "1h",
           });
+          User.findByIdAndUpdate(user.id, { token: refreshToken });
+          context.res.cookie("jwt", refreshToken, { maxAge: 24 * 60 * 60 * 1000, httpOnly: true });
           return { id: user.id, token: token, tokenExpiration: 1 };
         } else {
           return data;

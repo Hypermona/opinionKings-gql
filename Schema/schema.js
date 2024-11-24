@@ -12,7 +12,7 @@ const { checkUser } = require("./Queries/auth");
 
 /////////////////// Mutation Field Imports //////////////////////////////
 
-const { login } = require("./Mutations/auth");
+const { login, refreshToken } = require("./Mutations/auth");
 const { addCategory } = require("./Mutations/category");
 const { addPost } = require("./Mutations/post");
 const { addComment } = require("./Mutations/comment");
@@ -43,6 +43,7 @@ const Mutation = new GraphQLObjectType({
     addCategory,
     addComment,
     login,
+    refreshToken,
   },
 });
 

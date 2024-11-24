@@ -1,4 +1,5 @@
 const graphql = require("graphql");
+const jwt = require("jsonwebtoken");
 
 const User = require("../../Models/user");
 
