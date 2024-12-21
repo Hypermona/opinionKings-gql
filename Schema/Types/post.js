@@ -4,7 +4,8 @@ const Category = require("../../Models/category");
 const User = require("../../Models/user");
 const { Comment } = require("../../Models/post");
 
-const { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLList } = graphql;
+const { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLList, GraphQLID } = graphql;
+
 
 const PostType = new GraphQLObjectType({
   name: "Post",
@@ -14,6 +15,9 @@ const PostType = new GraphQLObjectType({
     image: { type: GraphQLString },
     shortDescription: { type: GraphQLString },
     description: { type: GraphQLString },
+    opinions: {
+      type: new GraphQLList(OpinionType),
+    },
     author: {
       type: UserType,
       resolve(parent, _) {
@@ -45,3 +49,5 @@ module.exports = PostType;
 const CategoryType = require("./category");
 const CommentType = require("./comment");
 const UserType = require("./user");
+const {OpinionType} = require("./opinion");
+

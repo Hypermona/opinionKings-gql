@@ -6,7 +6,7 @@ require("dotenv").config();
 
 const User = require("../../Models/user");
 
-const { LoginType, RefreshToken } = require("../Types/auth");
+const { LoginType, RefreshToken, logoutType } = require("../Types/auth");
 
 const { GraphQLString } = graphql;
 
@@ -32,13 +32,13 @@ const MutationFields = {
       if (!isEqual) {
         throw new Error("username or password is not matching");
       }
-      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "30s" });
+      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "6h" });
       const refershToken = jwt.sign({ id: user.id }, process.env.JWT_REFRESH_SECRET, {
-        expiresIn: "1h",
+        expiresIn: "24h",
       });
       User.findByIdAndUpdate(user.id, { token: refershToken });
       context.res.cookie("jwt", refershToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
-      return { id: user.id, token: token, tokenExpiration: 1 };
+      return { user, token: token, tokenExpiration: 1 };
     },
   },
   refreshToken: {
@@ -51,26 +51,44 @@ const MutationFields = {
           return jwt.verify(token, process.env.JWT_REFRESH_SECRET, async (err, decoded) => {
             if (err) {
               console.log(err);
-              context.res.sendStatus(400);
+              return err
             }
             const user = await User.findById(decoded.id);
             if (user) {
               console.log(user);
 
               const newToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-                expiresIn: "30s",
+                expiresIn: "6hr",
               });
-              return { id: user._id, token: newToken, tokenExpiration: 1 };
+              return { user, token: newToken, tokenExpiration: 1 };
             } else {
-              context.res.sendStatus(400);
+              throw new Error("No user")
             }
           });
+        } else {
+          throw new Error("No token");
+        }
+      } catch (error) {
+        console.log("eeeeee", error);
+        return error
+      }
+    },
+  },
+  logout: {
+    type: logoutType,
+    args: {},
+    async resolve(_, args, context) {
+      try {
+        const token = context.req.cookies.jwt;
+        if (token) {
+          context.res.cookie("jwt", "", { httpOnly: true, maxAge: 100 });
+          return {success:true}
         } else {
           context.res.sendStatus(406);
         }
       } catch (error) {
-        console.log(error);
-        context.res.sendStatus(500);
+        console.log("eeeeee", error);
+        return error
       }
     },
   },

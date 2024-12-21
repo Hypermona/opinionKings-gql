@@ -4,33 +4,29 @@ const { GraphQLObjectType, GraphQLSchema } = graphql;
 
 ////////////////// Query Field Imports  /////////////////////////
 
-const { post, posts } = require("./Queries/post");
-const { user, users } = require("./Queries/user");
-const { category, categories } = require("./Queries/category");
-const { comment, comments } = require("./Queries/comment");
-const { checkUser } = require("./Queries/auth");
+const postQueries = require("./Queries/post");
+const userQueries = require("./Queries/user");
+const categoryQueries = require("./Queries/category");
+const commentQueries = require("./Queries/comment");
+const authQueries = require("./Queries/auth");
 
 /////////////////// Mutation Field Imports //////////////////////////////
 
-const { login, refreshToken } = require("./Mutations/auth");
-const { addCategory } = require("./Mutations/category");
-const { addPost } = require("./Mutations/post");
-const { addComment } = require("./Mutations/comment");
-const { addUser } = require("./Mutations/user");
+const authMutations = require("./Mutations/auth");
+const categoryMutations = require("./Mutations/category");
+const postMutations = require("./Mutations/post");
+const commentMutations = require("./Mutations/comment");
+const userMutations = require("./Mutations/user");
 
 ////////////////// Queries /////////////////////////
 const RootQuery = new GraphQLObjectType({
   name: "RootQueryType",
   fields: {
-    post,
-    posts,
-    user,
-    users,
-    category,
-    categories,
-    comment,
-    comments,
-    checkUser,
+    ...authQueries,
+    ...commentQueries,
+    ...categoryQueries,
+    ...postQueries,
+    ...userQueries
   },
 });
 
@@ -38,12 +34,11 @@ const RootQuery = new GraphQLObjectType({
 const Mutation = new GraphQLObjectType({
   name: "Mutation",
   fields: {
-    addUser,
-    addPost,
-    addCategory,
-    addComment,
-    login,
-    refreshToken,
+    ...authMutations,
+    ...commentMutations,
+    ...categoryMutations,
+    ...postMutations,
+    ...userMutations
   },
 });
 

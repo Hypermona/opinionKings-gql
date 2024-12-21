@@ -13,11 +13,12 @@ const UserType = new GraphQLObjectType({
     name: { type: GraphQLString },
     userName: { type: GraphQLString },
     email: { type: GraphQLString },
-    followers: { type: GraphQLInt },
-    follwing: { type: GraphQLInt },
+    followers: { type: new GraphQLList(GraphQLID) },
+    following: { type: new GraphQLList(GraphQLID) },
     verified: { type: GraphQLBoolean },
     createdAt: { type: GraphQLString },
     token: { type: GraphQLString },
+    saved: { type: new GraphQLList(GraphQLID) },
     posts: {
       type: new GraphQLList(PostType),
       resolve(parent, _) {

@@ -10,12 +10,12 @@ const schema = require("./Schema/schema");
 const app = express();
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: ["http://192.168.20.4:3000","http://localhost:3000" ],
     credentials: true,
   })
 );
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+  // res.setHeader("Access-Control-Allow-Origin", ["http://localhost:3000", "http://192.168.20.4:3000"]);
   res.setHeader("Access-Control-Allow-Methods", "POST,GET,OPTIONS");
   res.setHeader("Acess-Control-Allow-Headers", "Content-Type", "Authorization");
   if (req.method === "OPTIONS") {
@@ -24,7 +24,7 @@ app.use((req, res, next) => {
   next();
 });
 app.use(express.json({ limit: "5mb" }));
-const mongoDbUrl = `mongodb://${process.env.DB_USER}:${process.env.DB_PWD}@localhost:27017/${process.env.DB_NAME}?authSource=${process.env.DB_NAME}&w=1`;
+const mongoDbUrl = `mongodb://${process.env.DB_USER}:${process.env.DB_PWD}@localhost:27017/${process.env.DB_NAME}?authSource=${"admin"}&w=1`;
 // const mongoDbUrl  = 'mongodb://localhost:27017/fakeking'
 mongoose.connect(mongoDbUrl, {
   useNewUrlParser: true,

@@ -20,6 +20,16 @@ const postSchema = new Schema(
     description: String,
     authorId: mongoose.Types.ObjectId,
     likes: { type: Number, default: 0 },
+    opinions: {
+      type: [
+        {
+          value: String,
+          label: String,
+          selectedBy: {type:[mongoose.Types.ObjectId],default:[]},
+        },
+      ],
+      default:[],
+    },
     dislikes: { type: Number, default: 0 },
     shares: { type: Number, default: 0 },
     saves: { type: Number, default: 0 },

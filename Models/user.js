@@ -9,9 +9,10 @@ const userSchema = new Schema(
     userName: String,
     email: String,
     password: String,
-    followers: { type: Number, default: 0 },
-    following: { type: Number, default: 0 },
+    followers: { type: [mongoose.Types.ObjectId] ,default:[]},
+    following: { type: [mongoose.Types.ObjectId] ,default:[]},
     verified: { type: Boolean, default: false },
+    saved: { type: [mongoose.Types.ObjectId] ,default:[]},
   },
   { timestamps: true }
 );
